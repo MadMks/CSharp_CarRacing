@@ -142,11 +142,13 @@ namespace Project_CarRacing
                 Race?.Invoke();
 
                 //CheckWinner();
+                
+                ShowWinnerInTheRace();
 
                 // слип 1 секунда
                 System.Threading.Thread.Sleep(1000);
 
-                ShowWinnerInTheRace();
+                // Дальше консоль чиститься.
             }
 
             //UnregisterCarsHandlers();
