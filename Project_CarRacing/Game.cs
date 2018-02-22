@@ -120,6 +120,18 @@ namespace Project_CarRacing
             GoToTheStart?.Invoke();
             System.Threading.Thread.Sleep(1000);
             //  отсчет - метод
+            
+            /*
+            // метод
+            Console.Clear();
+            for (int i = 5; i > 0; i--) {
+            	Console.WriteLine(i);
+            	System.Threading.Thread.Sleep(1000);
+            	// запуск события в котором методы всех машын 
+            	// (только вывод их позиций на карте)
+            	Race.
+            }
+            */
 
             StartARace();
         }
