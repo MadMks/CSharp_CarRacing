@@ -45,15 +45,7 @@ namespace Project_CarRacing
         /// </summary>
         public event DistanceDelegate DeclareADistanceRace;
 
-        /// <summary>
-        /// Делегат, проверка позиции авто.
-        /// </summary>
-        /// <returns>Авто.</returns>
-        //public delegate Car CheckingTheCarPosition();
-        /// <summary>
-        /// Собитие "Проверить позиции авто."
-        /// </summary>
-        //public event CheckingTheCarPosition CheckTheCarPositions;
+        public event GameDelegate ShowMapAllCar;
 
 
         // TODO возможно метод регистер (который зарегистрирует сразу везде все машины).
@@ -63,6 +55,8 @@ namespace Project_CarRacing
             {
                 DeclareADistanceRace += car.SetDistanceRace;
 
+                ShowMapAllCar += car.ShowMapOfDrivingAuto;
+
                 GoToTheStart += car.GetReady;
                 GoToTheStart += car.ShowMapOfDrivingAuto;
 
@@ -71,8 +65,6 @@ namespace Project_CarRacing
 
                 // на все машины подписать "сообщение о победителе" (оно в гейм - одно).
                 car.Finish += Finish;
-
-                //CheckTheCarPositions += car.CheckPosition;
             }
 
             NumberCarInRace = cars.Count;
@@ -117,23 +109,41 @@ namespace Project_CarRacing
         /// </summary>
         public void Start()
         {
+            Console.WriteLine("\n Гоночная трасса пуста.");
+            Console.WriteLine(new string('=', 36));
+
+            ShowMapAllCar?.Invoke();
+
+            Console.WriteLine("\n Нажмите любую клавишу для начала гонок...");
+            Console.ReadKey();
+
             GoToTheStart?.Invoke();
-            System.Threading.Thread.Sleep(1000);
-            //  отсчет - метод
-            
-            /*
-            // метод
-            Console.Clear();
-            for (int i = 5; i > 0; i--) {
-            	Console.WriteLine(i);
-            	System.Threading.Thread.Sleep(1000);
-            	// запуск события в котором методы всех машын 
-            	// (только вывод их позиций на карте)
-            	Race.
-            }
-            */
+            //System.Threading.Thread.Sleep(1000);
+
+            Countdown();
 
             StartARace();
+        }
+
+
+
+        /// <summary>
+        /// Обратный отсчет (начинается с "5").
+        /// </summary>
+        private void Countdown()
+        {
+            for (int i = 5; i >= 0; i--)
+            {
+                Console.Clear();
+
+                Console.WriteLine($"\n Т-: {i}");
+                Console.WriteLine(new string('=', 36));
+
+                ShowMapAllCar?.Invoke();
+
+                System.Threading.Thread.Sleep(1000);
+                // NOTE: дальше консоль чиститься. 
+            }
         }
 
         // TODO event StartARace    (начать гонку)
@@ -148,34 +158,34 @@ namespace Project_CarRacing
         {
             while (SummaryTable.Count != NumberCarInRace)
             {
-                // clear
                 Console.Clear();
 
-                Race?.Invoke();
+                Console.WriteLine($"\n Гонка:");
+                Console.WriteLine(new string('=', 36));
 
-                //CheckWinner();
+                Race?.Invoke();
                 
                 ShowWinnerInTheRace();
 
-                // слип 1 секунда
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(1000);    // TODO method Pause(msec)
 
                 // Дальше консоль чиститься.
             }
 
-            //UnregisterCarsHandlers();
+            ShowRaceWinner();
+        }
 
-            //ShowWinnerInTheRace();
+        private void ShowRaceWinner()
+        {
+            Console.WriteLine("\n\n Первое место занял: " 
+                + SummaryTable[0].GetType().Name);
         }
 
         private void Finish(Car car)
         {
-            ////Console.WriteLine(" WIN");
             StopTheCar(car);
 
-
             RecordInTheWinnersTable(car);
-
 
             //ShowWinnerInTheRace();  // ???
             //Console.ReadKey();
@@ -188,12 +198,12 @@ namespace Project_CarRacing
 
         private void ShowWinnerInTheRace()
         {
-            Console.WriteLine(" Итоговая таблица:\n");
+            if (SummaryTable.Count > 0)
+            {
+                Console.WriteLine("\n Итоговая таблица:");
+                Console.WriteLine(new string('-', 36));
+            }
 
-            //foreach (Car car in SummaryTable)
-            //{
-            //    Console.WriteLine($"{car.}");
-            //}
 
             for (int i = 0; i < SummaryTable.Count; i++)
             {
@@ -201,38 +211,6 @@ namespace Project_CarRacing
             }
         }
 
-        //private void CheckWinner()
-        //{
-        //    foreach (CheckingTheCarPosition item in CheckTheCarPositions.GetInvocationList())
-        //    {
-        //        if (item().Position == Distance)
-        //        {
-        //            Console.WriteLine(" Победитель: " + item().GetType().Name);
-        //            Console.ReadKey();
-        //            // TODO остановить гонку - событием.
-        //        }
-        //    }
-        //}
 
-
-        /// <summary>
-        /// Вывод текущего положения автомобилей.
-        /// </summary>
-        private void ShowCurrentVehiclePosition()
-        {
-            // TODO write
-
-            // TODO вместо метода событие!!!
-        }
-
-        // TODO event победитель ИЛИ метод победитель
-        // метод WinnerInTheRace(string ???)
-        //private void WinnerInTheRace()
-        //{
-        //    //foreach (var item in collection)
-        //    //{
-
-        //    //}
-        //}
     }
 }

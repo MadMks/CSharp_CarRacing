@@ -32,12 +32,12 @@ namespace Project_CarRacing
 
             game.RegisterCarsHandlers(cars);
 
-            foreach (Car item in cars)
-            {
-                item.ShowMapOfDrivingAuto();
-            }
-            Console.ReadKey();
-            Console.Clear();
+            //foreach (Car item in cars)
+            //{
+            //    item.ShowMapOfDrivingAuto();
+            //}
+            //Console.ReadKey();
+            //Console.Clear();
 
             game.Start();
 
