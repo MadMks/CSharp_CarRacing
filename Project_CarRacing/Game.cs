@@ -111,6 +111,9 @@ namespace Project_CarRacing
         {
             Console.WriteLine("\n Гоночная трасса пуста.");
             Console.WriteLine(new string('=', 36));
+            /*
+            ShowHeader("Гоночная трасса пуста.");
+            */
 
             ShowMapAllCar?.Invoke();
 
@@ -138,6 +141,9 @@ namespace Project_CarRacing
 
                 Console.WriteLine($"\n Т-: {i}");
                 Console.WriteLine(new string('=', 36));
+                /*
+                ShowHeader("Обратный отсчет: " + i);
+                */
 
                 ShowMapAllCar?.Invoke();
 
@@ -162,6 +168,9 @@ namespace Project_CarRacing
 
                 Console.WriteLine($"\n Гонка:");
                 Console.WriteLine(new string('=', 36));
+                /*
+                ShowHeader("Гонка:");
+                */
 
                 Race?.Invoke();
                 
@@ -210,6 +219,15 @@ namespace Project_CarRacing
                 Console.WriteLine($" {i + 1}. {SummaryTable[i].GetType().Name}");
             }
         }
+        
+        /*
+        private void ShowHeader(string str)
+        {
+        	Console.WriteLine("\n " + str);
+            Console.WriteLine(new string('=', 36));
+            Console.WriteLine();
+        }
+        */
 
 
     }
