@@ -151,7 +151,7 @@ namespace Project_CarRacing
         /// </summary>
         public void ShowMapOfDrivingAuto()
         {
-            foreach (string item in MapOfDrivingAuto)   // TODO TODO
+            foreach (string item in MapOfDrivingAuto)
             {
                 Write(item);
             }
