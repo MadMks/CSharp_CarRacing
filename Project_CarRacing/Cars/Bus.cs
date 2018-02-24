@@ -12,33 +12,23 @@ namespace Project_CarRacing
     class Bus : Car
     {
         /// <summary>
+        /// Максимальная скорость "Bus" по умолчанию.
+        /// </summary>
+        private const int _defaultTopSpeed = 2;
+
+        // Конструкторы.
+
+        /// <summary>
         /// Конструктор по умолчанию.
         /// </summary>
-        public Bus() : base(2) { }
+        public Bus() : base(_defaultTopSpeed) { }
+
         /// <summary>
         /// Конструктор с параметром.
         /// </summary>
-        /// <param name="topSpeed">максимальная скорость.</param>
+        /// <param name="topSpeed">Максимальная скорость.</param>
         public Bus(int topSpeed) : base(topSpeed) { }
 
-
-
-        /// <summary>
-        /// Ехать.
-        /// </summary>
-        public override void Drive()
-        {
-            // Авто едет - меняет скорость,
-            // получаем его скорость.
-            Speed = rand.Next(1, TopSpeed + 1);
-            //Speed = 1;
-            ////Console.WriteLine($" ) speed = {Speed}");    // TODO delete
-            // По скорости "вычисляем" текущую позицию.
-            Position += Speed;
-            ////Console.WriteLine(" " + Position);
-            //CalculateTheCurrentPosition();
-            MarkThePosition(Position);
-        }
 
 
 
@@ -46,6 +36,7 @@ namespace Project_CarRacing
         {
             return this.GetType().Name;
         }
+
 
     }
 }

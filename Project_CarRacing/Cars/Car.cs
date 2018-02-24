@@ -1,4 +1,5 @@
 ﻿using System;
+using static System.Console;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,14 +12,25 @@ namespace Project_CarRacing
     /// </summary>
     abstract class Car
     {
+        /// <summary>
+        /// Делегат, финиш авто.
+        /// </summary>
+        /// <param name="car">Авто которое финишировало.</param>
         public delegate void FinishDel(Car car);
+
+        /// <summary>
+        /// Событие "Финиш".
+        /// </summary>
         public event FinishDel Finish;
 
         /// <summary>
         /// Скорость авто.
         /// </summary>
         public int Speed { get; set; }
-        
+        /// <summary>
+        /// Допустимая максимальная скорость.
+        /// </summary>
+        private const int _permissibleMaximumSpeed = 10;
 
         /// <summary>
         /// Максимальная скорость.
@@ -27,16 +39,22 @@ namespace Project_CarRacing
         /// <summary>
         /// Максимальная скорость.
         /// </summary>
+        /// Указываем при создании авто.
+        /// По умолчанию "0"
+        /// При запросе TopSpeed запустит исключительную ситуацию.
         public int TopSpeed
         {
-            get
+            get { return _topSpeed; }
+            set
             {
-                if (_topSpeed != 0)
+                if (value > 0 && value <= _permissibleMaximumSpeed)
                 {
-                    return _topSpeed;
+                    _topSpeed = value;
                 }
-                Console.WriteLine("Макс скорость не может быть 0");
-                throw new Exception();  // TODO throw Макс скорость не может быть 0
+                else
+                {
+                    throw new UnacceptableMaximumSpeedException();
+                }
             }
         }
 
@@ -44,23 +62,27 @@ namespace Project_CarRacing
         /// <summary>
         /// Текущая позиция авто.
         /// </summary>
-        //public int Position { get; set; }
         private int _position;
-
+        /// <summary>
+        /// Текущая позиция авто.
+        /// </summary>
         public int Position
         {
             get { return _position; }
             set
             {
+                // Если текущая позиция меньше позиции финиша.
                 if (value < MapOfDrivingAuto.Count)
                 {
                     _position = value;
                 }
+                // Иначе присваиваем максимальную(финиш).
+                // И зпускаем событие "Финиш".
                 else
                 {
                     Position = MapOfDrivingAuto.Count - 1;
+
                     Finish?.Invoke(this);
-                    //Position = MapOfDrivingAuto.Count - 1;
                 }
             }
         }
@@ -80,18 +102,12 @@ namespace Project_CarRacing
 
 
 
+        // Конструкторы.
+
         /// <summary>
         /// Конструктор по умолчанию.
         /// </summary>
-        public Car() : this(0)
-        {
-            Speed = 0;
-            Position = 0;
-
-            
-        }
-
-
+        public Car() : this(0) { }
 
         /// <summary>
         /// Конструктор с параметром.
@@ -101,22 +117,22 @@ namespace Project_CarRacing
         {
             rand = new Random();
 
-            _topSpeed = topSpeed;
+            TopSpeed = topSpeed;
 
-            //MapOfDrivingAuto = new List<string>(5);
-            MapOfDrivingAuto = new List<string>();    // TODO new future
+            MapOfDrivingAuto = new List<string>();
 
-            //for (int i = 0; i < MapOfDrivingAuto.Capacity; i++)
-            //{
-            //    MapOfDrivingAuto.Add("-");
-            //}
-
-            //MapOfDrivingAuto[0] = "|";
-            //MapOfDrivingAuto[MapOfDrivingAuto.Count - 1] = "|";
+            Speed = 0;
+            _position = 0;
         }
 
 
-        // метод получение расстояния гонки
+
+        // Методы.
+
+        /// <summary>
+        /// Получение расстояния гонки (для авто).
+        /// </summary>
+        /// <param name="distance">Расстояние гонки.</param>
         public void SetDistanceRace(int distance)
         {
             for (int i = 0; i < distance; i++)
@@ -124,20 +140,22 @@ namespace Project_CarRacing
                 MapOfDrivingAuto.Add("-");
             }
 
-            MapOfDrivingAuto[0] = "|";
-            MapOfDrivingAuto[MapOfDrivingAuto.Count - 1] = "|";
+            MapOfDrivingAuto[0] = "|";  // линия старта.
+            MapOfDrivingAuto[MapOfDrivingAuto.Count - 1] = "|"; // линия финиша.
         }
+
+
         
         /// <summary>
         /// Показать карту передвижения авто.
         /// </summary>
         public void ShowMapOfDrivingAuto()
         {
-            foreach (string item in MapOfDrivingAuto)
+            foreach (string item in MapOfDrivingAuto)   // TODO TODO
             {
-                Console.Write(item);
+                Write(item);
             }
-            Console.WriteLine("\t" + this);
+            WriteLine("\t" + this);
         }
 
 
@@ -147,13 +165,8 @@ namespace Project_CarRacing
         /// </summary>
         public void GetReady()
         {
-            if (TopSpeed != 0)  // TODO поставил exc - проверка уже не нужна.
-            {
-                MapOfDrivingAuto[Position] = AutoIcon;
-            }
+            MapOfDrivingAuto[Position] = AutoIcon;
         }
-
-        // TODO изменить скорость(){SwapPosition(speed)} - !?
 
 
 
@@ -168,37 +181,21 @@ namespace Project_CarRacing
         }
 
 
-        /// <summary>
-        /// Вычисление текущей позиции авто.
-        /// </summary>
-        //protected void CalculateTheCurrentPosition()
-        //{
-        //    if ((Position + Speed) <= MapOfDrivingAuto.Count)
-        //    {
-        //        Position += Speed;
-        //    }
-        //    else
-        //    {
-        //        Position = MapOfDrivingAuto.Count - 1;
-        //    }
-        //}
-
-
 
         /// <summary>
         /// Ехать.
         /// </summary>
-        public abstract void Drive();
+        public virtual void Drive()
+        {
+            // Авто едет - меняет скорость,
+            // получаем его скорость.
+            Speed = rand.Next(1, TopSpeed + 1);
+            // "Получаем позицию исходя из скорости".
+            Position += Speed;
 
-        /// <summary>
-        /// Проверка позиции авто.
-        /// </summary>
-        /// <returns>Авто.</returns>
-        //public Car CheckPosition()
-        //{
-        //    return this;
-        //}
+            MarkThePosition(Position);
+        }
 
-        // TODO Стоп
+
     }
 }

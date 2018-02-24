@@ -1,4 +1,5 @@
 ﻿using System;
+using static System.Console;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,23 +10,119 @@ namespace Project_CarRacing
     /// <summary>
     /// Класс "Игра".
     /// </summary>
-    class Game  // TODO static all
+    class Game
     {
-        public int NumberCarInRace { get; set; }
+        /// <summary>
+        /// Время обновления экрана в миллисекундах.
+        /// </summary>
+        private const int _updateScreenTimeMS = 500;
+
+        /// <summary>
+        /// Кол-во авто участвующих в гонке.
+        /// </summary>
+        private int _numberCarInRace;
+        /// <summary>
+        /// Кол-во авто участвующих в гонке.
+        /// </summary>
+        public int NumberCarInRace
+        {
+            get { return _numberCarInRace; }
+            set
+            {
+                if (value > 0)
+                {
+                    _numberCarInRace = value;
+                }
+                else
+                {
+                    throw new CarListIsEmptyException();
+                }
+            }
+        }
+
 
         /// <summary>
         /// Итоговая таблица (победителей).
         /// </summary>
-        public List<Car> SummaryTable { get; set; }
+        private List<Car> SummaryTable { get; set; }
 
 
-        // TODO min and max distance
+        /// <summary>
+        /// Минимальная длина гоночной трассы.
+        /// </summary>
+        private const int _minDistance = 5;
+        /// <summary>
+        /// Максимальная длина гоночной трассы.
+        /// </summary>
+        private const int _mахDistance = 55;
+
         /// <summary>
         /// Дистанция гонки.
         /// </summary>
-        public int Distance { get; set; }   // TODO не меньше 5 и не больше ?
+        private int _distance;
+        /// <summary>
+        /// Дистанция гонки.
+        /// </summary>
+        public int Distance
+        {
+            get { return _distance; }
+            set
+            {
+                if (value >= _minDistance && value <= _mахDistance)
+                {
+                    _distance = value;
+                }
+                else
+                {
+                    throw new InvalidLengthOfRaceTrackException();
+                }
+            }
+        }
 
-        public Game() : this(5){ }
+
+        // Делегаты.
+
+        /// <summary>
+        /// Делегат, методы игры.
+        /// </summary>
+        public delegate void GameDelegate();
+        /// <summary>
+        /// Делегат, передача дистанции игрокам(авто).
+        /// </summary>
+        /// <param name="distance">Дистанция гонки.</param>
+        public delegate void DistanceDelegate(int distance);
+
+
+        // События.
+        
+        /// <summary>
+        /// Событие "Сообщить о дистанции гонки".
+        /// </summary>
+        private event DistanceDelegate DeclareADistanceRace;
+        /// <summary>
+        /// Событие "Показать карту передвижения всех машин".
+        /// </summary>
+        private event GameDelegate ShowMapAllCar;
+        /// <summary>
+        /// Событие "Выйти на старт".
+        /// </summary>
+        private event GameDelegate GoToTheStart;
+        /// <summary>
+        /// Событие "Гонка".
+        /// </summary>
+        private event GameDelegate Race;
+
+
+        // Конструкторы.
+
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
+        public Game() : this(5) { }
+        /// <summary>
+        /// Конструктор с параметрами.
+        /// </summary>
+        /// <param name="distance">Дистанция гонки.</param>
         public Game(int distance)
         {
             Distance = distance;
@@ -34,21 +131,13 @@ namespace Project_CarRacing
         }
 
 
+
+        // Методы.
+
         /// <summary>
-        /// Делегат, методы игры.
+        /// Регистрируем все авто в гонке.
         /// </summary>
-        public delegate void GameDelegate();
-
-        public delegate void DistanceDelegate(int distance);
-        /// <summary>
-        /// Событие "Сообщить о дистанции гонки".
-        /// </summary>
-        public event DistanceDelegate DeclareADistanceRace;
-
-        public event GameDelegate ShowMapAllCar;
-
-
-        // TODO возможно метод регистер (который зарегистрирует сразу везде все машины).
+        /// <param name="cars">Список авто.</param>
         public void RegisterCarsHandlers(List<Car> cars)
         {
             foreach (Car car in cars)
@@ -63,7 +152,6 @@ namespace Project_CarRacing
                 Race += car.Drive;
                 Race += car.ShowMapOfDrivingAuto;
 
-                // на все машины подписать "сообщение о победителе" (оно в гейм - одно).
                 car.Finish += Finish;
             }
 
@@ -72,21 +160,16 @@ namespace Project_CarRacing
             TellTheDistancePlayers(Distance);
         }
 
-        //public void UnregisterCarsHandlers()
-        //{
-        //    foreach (Car car in SummaryTable)
-        //    {
-        //        Race -= car.ShowMapOfDrivingAuto;
-        //    }
-        //}
+        
 
         /// <summary>
         /// Останавливаем авто.
         /// </summary>
-        public void StopTheCar(Car car)
+        private void StopTheCar(Car car)
         {
             Race -= car.Drive;
         }
+
 
 
         /// <summary>
@@ -101,27 +184,18 @@ namespace Project_CarRacing
 
 
         /// <summary>
-        /// Событие "Выйти на старт".
-        /// </summary>
-        public event GameDelegate GoToTheStart;
-        /// <summary>
         /// Старт игры.
         /// </summary>
         public void Start()
         {
-            Console.WriteLine("\n Гоночная трасса пуста.");
-            Console.WriteLine(new string('=', 36));
-            /*
             ShowHeader("Гоночная трасса пуста.");
-            */
 
             ShowMapAllCar?.Invoke();
 
-            Console.WriteLine("\n Нажмите любую клавишу для начала гонок...");
-            Console.ReadKey();
+            WriteLine("\n Нажмите любую клавишу для начала гонок...");
+            ReadKey();
 
             GoToTheStart?.Invoke();
-            //System.Threading.Thread.Sleep(1000);
 
             Countdown();
 
@@ -137,26 +211,20 @@ namespace Project_CarRacing
         {
             for (int i = 5; i >= 0; i--)
             {
-                Console.Clear();
+                Clear();
 
-                Console.WriteLine($"\n Т-: {i}");
-                Console.WriteLine(new string('=', 36));
-                /*
                 ShowHeader("Обратный отсчет: " + i);
-                */
 
                 ShowMapAllCar?.Invoke();
 
                 System.Threading.Thread.Sleep(1000);
+
                 // NOTE: дальше консоль чиститься. 
             }
         }
 
-        // TODO event StartARace    (начать гонку)
-        /// <summary>
-        /// Событие "Гонка".
-        /// </summary>
-        private event GameDelegate Race;
+        
+
         /// <summary>
         /// Начать гонку.
         /// </summary>
@@ -164,70 +232,101 @@ namespace Project_CarRacing
         {
             while (SummaryTable.Count != NumberCarInRace)
             {
-                Console.Clear();
-
-                Console.WriteLine($"\n Гонка:");
-                Console.WriteLine(new string('=', 36));
-                /*
+                Clear();
                 ShowHeader("Гонка:");
-                */
 
                 Race?.Invoke();
                 
                 ShowWinnerInTheRace();
 
-                System.Threading.Thread.Sleep(1000);    // TODO method Pause(msec)
+                System.Threading.Thread.Sleep(_updateScreenTimeMS);
 
-                // Дальше консоль чиститься.
+                // NOTE: дальше консоль чиститься.
             }
 
             ShowRaceWinner();
         }
 
+
+
+        /// <summary>
+        /// Показать победителя гонки.
+        /// </summary>
         private void ShowRaceWinner()
         {
-            Console.WriteLine("\n\n Первое место занял: " 
+            WriteLine("\n" + new string('=', 36));
+            Design.Green();
+            WriteLine("\n Первое место занял: " 
                 + SummaryTable[0].GetType().Name);
+            Design.Default();
         }
 
+
+
+        /// <summary>
+        /// Финиш для авто.
+        /// </summary>
+        /// <param name="car">Авто приехавшее на финиш.</param>
         private void Finish(Car car)
         {
             StopTheCar(car);
 
             RecordInTheWinnersTable(car);
-
-            //ShowWinnerInTheRace();  // ???
-            //Console.ReadKey();
         }
 
+
+
+        /// <summary>
+        /// Записать авто в список победителей.
+        /// </summary>
+        /// <param name="car">Авто приехавшее на финиш.</param>
         private void RecordInTheWinnersTable(Car car)
         {
             SummaryTable.Add(car);
         }
 
+
+
+        /// <summary>
+        /// Показать всех учасников(победителей) приехавших на финиш.
+        /// </summary>
         private void ShowWinnerInTheRace()
         {
-            if (SummaryTable.Count > 0)
+            if (ThereAreWinners())
             {
-                Console.WriteLine("\n Итоговая таблица:");
-                Console.WriteLine(new string('-', 36));
-            }
+                WriteLine("\n Итоговая таблица:");
+                Design.Line('-');
 
-
-            for (int i = 0; i < SummaryTable.Count; i++)
-            {
-                Console.WriteLine($" {i + 1}. {SummaryTable[i].GetType().Name}");
+                for (int i = 0; i < SummaryTable.Count; i++)
+                {
+                    WriteLine($" {i + 1}. {SummaryTable[i].GetType().Name}");
+                }
             }
         }
-        
-        /*
+
+
+
+        /// <summary>
+        /// Есть ли хоть один победитель.
+        /// </summary>
+        /// <returns>Возвращает "true" если хоть одно авто приехало на финиш.</returns>
+        private bool ThereAreWinners()
+        {
+            return SummaryTable.Count > 0;
+        }
+
+
+
+        /// <summary>
+        /// Вывести хедер с текстом.
+        /// </summary>
+        /// <param name="str">Выводимая строка.</param>
         private void ShowHeader(string str)
         {
-        	Console.WriteLine("\n " + str);
-            Console.WriteLine(new string('=', 36));
-            Console.WriteLine();
+            WriteLine("\n " + str);
+            Design.Line('=');
+            WriteLine();
         }
-        */
 
 
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using static System.Console;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,40 +11,61 @@ namespace Project_CarRacing
     {
         static void Main(string[] args)
         {
+            Title = "Автомобильные гонки";
 
-            //Bus b = new Bus();
-            //b.ShowMapOfDrivingAuto();
-            //b.GetReady();
-            //b.ShowMapOfDrivingAuto();
-            //b.Drive();
-            //b.ShowMapOfDrivingAuto();
-            //b.Drive();
-            //b.ShowMapOfDrivingAuto();
-
-            Game game = new Game(25);
-
-            List<Car> cars = new List<Car>
+            try
             {
-                new Bus(2),
-                new Bus(3)
-            };
-            //Bus bus = new Bus(2);
-            
+                Game game = new Game(55);
 
-            game.RegisterCarsHandlers(cars);
-
-            //foreach (Car item in cars)
-            //{
-            //    item.ShowMapOfDrivingAuto();
-            //}
-            //Console.ReadKey();
-            //Console.Clear();
-
-            game.Start();
+                List<Car> cars = new List<Car>
+                {
+                    new PassengerCar(4),
+                    new Bus(3),
+                    new SportsCar(5),
+                    new Truck(3)
+                };
 
 
-            Console.WriteLine();
-            Console.WriteLine();
+
+                game.RegisterCarsHandlers(cars);
+
+
+                game.Start();
+            }
+            catch (InvalidLengthOfRaceTrackException e)
+            {
+                PrintException(e.Message);
+            }
+            catch (CarListIsEmptyException e)
+            {
+                PrintException(e.Message);
+            }
+            catch (UnacceptableMaximumSpeedException e)
+            {
+                PrintException(e.Message);
+            }
+            catch (Exception e)
+            {
+                PrintException(e.Message);
+            }
+
+
+            WriteLine("\n");
         }
+
+
+
+        /// <summary>
+        /// Вывод исключительных ситуаций (отформатированной строкой).
+        /// </summary>
+        /// <param name="eMessage">Сообщение исключения.</param>
+        private static void PrintException(string eMessage)
+        {
+            Design.Red();
+            WriteLine("\n [error] " + eMessage + "\n");
+            Design.Default();
+        }
+
+
     }
 }

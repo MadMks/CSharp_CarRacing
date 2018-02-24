@@ -48,6 +48,10 @@
     <Compile Include="Cars\PassengerCar.cs" />
     <Compile Include="Cars\SportsCar.cs" />
     <Compile Include="Cars\Truck.cs" />
+    <Compile Include="Design\Design.cs" />
+    <Compile Include="Exception\CarListIsEmpty.cs" />
+    <Compile Include="Exception\InvalidLengthOfRaceTrack.cs" />
+    <Compile Include="Exception\UnacceptableMaximumSpeed.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
